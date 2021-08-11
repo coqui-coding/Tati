@@ -3,10 +3,16 @@
 import requests
 from bs4 import BeautifulSoup
 import logging
+import re
 
 logging.basicConfig(level=logging.DEBUG)
 
 nhc_site = 'https://www.nhc.noaa.gov/'
+
+
+def add_space_to_camel_case(string):
+    return re.sub(r"(?<=\w)([A-Z])", r" \1", string.strip())
+
 
 if __name__ == '__main__':
     source = requests.get(nhc_site).text
@@ -82,12 +88,11 @@ if __name__ == '__main__':
             logging.debug(f'On box number: {row.index(box) + 1}')
 
             try:
-                # TODO: add spaces to important_info and link_text
                 if box['class'] == ['reg']:
                     if box.a is None:
-                        important_info = box.text.strip()
+                        important_info = add_space_to_camel_case(box.text)
                     else:
-                        important_info = box.text.strip()
+                        important_info = add_space_to_camel_case(box.text)
                         link = nhc_site + box.a['href']
                         image_tag = box.img
 
@@ -95,7 +100,7 @@ if __name__ == '__main__':
 
                 elif box.a is not None and box['class'] == ['std']:
                     link = nhc_site + box.a['href']
-                    link_text = box.text.strip()
+                    link_text = add_space_to_camel_case(box.text)
 
                     logging.debug(f'link_text = {link_text}')
 
