@@ -64,8 +64,16 @@ if __name__ == '__main__':
 
     logging.info('Starting parsing storm info')
 
-    # TODO: Detect number of rows dynamically
-    for row_number in range(1, 4):
+    amount_of_rows = len(storm_body.find_all('tr'))
+
+    for row_number in range(1, amount_of_rows):
+        row = storm_body.find_all('tr')[row_number]
+
+        # Checks for table row tags inside of table row tags and deletes the amount of tags accordingly
+        amount_of_rows -= int(((str(row).count('tr>') + str(row).count('<tr ')) / 2) - 1)
+
+    # Starts on 1 to skip headline
+    for row_number in range(1, amount_of_rows):
         logging.debug(f'On row: {row_number}')
 
         row = storm_body.find_all('tr')[row_number].find_all('td')
